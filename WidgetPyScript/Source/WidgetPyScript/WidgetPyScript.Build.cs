@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class PythonScriptingWidget : ModuleRules
+public class WidgetPyScript : ModuleRules
 {
-	public PythonScriptingWidget(ReadOnlyTargetRules Target) : base(Target)
+	public WidgetPyScript(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -34,6 +34,10 @@ public class PythonScriptingWidget : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"Projects",
+				"InputCore",
+				"UnrealEd",
+				"ToolMenus",
 				"CoreUObject",
 				"Engine",
 				"Slate",
