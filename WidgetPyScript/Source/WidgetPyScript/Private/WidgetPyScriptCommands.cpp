@@ -6,7 +6,7 @@
 
 void FWidgetPyScriptCommands::RegisterCommands()
 {
-	UI_COMMAND(PluginAction, "WidgetPyScript", "Execute WidgetPyScript action", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(PluginAction, "Generate Py", "Generate Python scripts based on UMG variables in Designer", EUserInterfaceActionType::Button, FInputGesture());
 }
 
 #undef LOCTEXT_NAMESPACE
