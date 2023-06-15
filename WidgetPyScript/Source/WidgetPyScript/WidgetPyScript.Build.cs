@@ -38,10 +38,14 @@ public class WidgetPyScript : ModuleRules
 				"InputCore",
 				"UnrealEd",
 				"ToolMenus",
-				"CoreUObject",
+                "ContentBrowser",
+                "CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"UMGEditor",
+                "Blutility",
+				"Kismet"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

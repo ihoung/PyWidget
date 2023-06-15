@@ -47,6 +47,7 @@ TSharedRef< FSlateStyleSet > FWidgetPyScriptStyle::Create()
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("WidgetPyScript")->GetBaseDir() / TEXT("Resources"));
 
 	Style->Set("WidgetPyScript.PluginAction", new IMAGE_BRUSH(TEXT("ButtonIcon_40x"), Icon40x40));
+	Style->Set("WidgetPyScript.MenuIcon", new IMAGE_BRUSH(TEXT("ButtonIcon_16x"), Icon16x16));
 
 	return Style;
 }

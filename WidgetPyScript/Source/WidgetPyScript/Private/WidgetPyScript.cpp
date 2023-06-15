@@ -3,17 +3,18 @@
 #include "WidgetPyScript.h"
 #include "WidgetPyScriptStyle.h"
 #include "WidgetPyScriptCommands.h"
+#include "WidgetPyScriptFunctionLibrary.h"
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
-
-static const FName WidgetPyScriptTabName("WidgetPyScript");
+#include "ContentBrowserModule.h"
+#include "EditorUtilityWidgetBlueprint.h"
 
 #define LOCTEXT_NAMESPACE "FWidgetPyScriptModule"
 
 void FWidgetPyScriptModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	
+
 	FWidgetPyScriptStyle::Initialize();
 	FWidgetPyScriptStyle::ReloadTextures();
 
@@ -45,13 +46,11 @@ void FWidgetPyScriptModule::ShutdownModule()
 
 void FWidgetPyScriptModule::PluginButtonClicked()
 {
-	// Put your "OnButtonClicked" stuff here
-	//FText DialogText = FText::Format(
-	//						LOCTEXT("PluginButtonDialogText", "Add code to {0} in {1} to override this button's actions"),
-	//						FText::FromString(TEXT("FWidgetPyScriptModule::PluginButtonClicked()")),
-	//						FText::FromString(TEXT("WidgetPyScript.cpp"))
-	//				   );
-	//FMessageDialog::Open(EAppMsgType::Ok, DialogText);
+	FText DialogText = FText(
+							LOCTEXT("PluginButtonDialogText", 
+								"Not supported yet.\n Please locate the asset in Content Browser and generate Python scripts from RMB clicked menu.")
+					   );
+	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 }
 
 void FWidgetPyScriptModule::RegisterMenus()
@@ -77,6 +76,69 @@ void FWidgetPyScriptModule::RegisterMenus()
 			}
 		}
 	}
+
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
+	{
+		TArray<FContentBrowserMenuExtender_SelectedAssets>& CBMenuAssetExtenderDelegates = ContentBrowserModule.GetAllAssetViewContextMenuExtenders();
+		CBMenuAssetExtenderDelegates.Add(FContentBrowserMenuExtender_SelectedAssets::CreateRaw(this, &FWidgetPyScriptModule::AddCBMenuExtender));
+	}
+}
+
+TSharedRef<FExtender> FWidgetPyScriptModule::AddCBMenuExtender(const TArray<FAssetData>& SelectedAssets)
+{
+	TSharedRef<FExtender> Extender = MakeShared<FExtender>();
+
+	bool HasWidgetAsset = false;
+	for (auto AssetIt = SelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt)
+	{
+		const FAssetData& Asset = *AssetIt;
+		if (!Asset.IsRedirector() && Asset.AssetClass != NAME_Class && !(Asset.PackageFlags & PKG_FilterEditorOnly))
+		{
+			if (Asset.GetClass()->IsChildOf(UEditorUtilityWidgetBlueprint::StaticClass()))
+			{
+				HasWidgetAsset = true;
+				break;
+			}
+		}
+	}
+
+	if (HasWidgetAsset)
+	{
+		Extender->AddMenuExtension(
+			"CommonAssetActions",
+			EExtensionHook::After,
+			PluginCommands,
+			FMenuExtensionDelegate::CreateLambda([&](FMenuBuilder& MenuBuilder)
+				{
+					MenuBuilder.BeginSection("Python", LOCTEXT("ASSET_CONTEXT", "Python"));
+					{
+						// Add Menu Entry Here
+						MenuBuilder.AddMenuEntry(
+							LOCTEXT("GeneratePy", "Genereate Python Scripts"),
+							LOCTEXT("GeneratePy ToolTip", "Generate Python Scripts for the associated Widget"),
+							FSlateIcon(FWidgetPyScriptStyle::GetStyleSetName(), "WidgetPyScript.MenuIcon"),
+							FUIAction(FExecuteAction::CreateRaw(this, &FWidgetPyScriptModule::AddCBMenuAction, SelectedAssets)),
+							NAME_None,
+							EUserInterfaceActionType::Button
+						);
+					}
+					MenuBuilder.EndSection();
+				}
+			)
+		);
+	}
+
+	return Extender;
+}
+
+void FWidgetPyScriptModule::AddCBMenuAction(TArray<FAssetData> SelectedAssets)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Num: %d"), SelectedAssets.Num());
+	//for (auto AssetIt = SelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt)
+	//{
+	//	const FAssetData& Asset = *AssetIt;
+	//	UE_LOG(LogTemp, Warning, TEXT("asset: %s"), *Asset.GetFullName());
+	//}
 }
 
 #undef LOCTEXT_NAMESPACE
