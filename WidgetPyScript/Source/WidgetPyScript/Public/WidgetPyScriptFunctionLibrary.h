@@ -14,9 +14,19 @@ class WIDGETPYSCRIPT_API UWidgetPyScriptFunctionLibrary : public UBlueprintFunct
 {
 	GENERATED_BODY()
 	
-//public:
+public:
 	//static UObject* GetCurrentEditingWidget();
 
 	//UFUNCTION(BlueprintCallable)
 	//static TArray<UObject*> GetAllObjects();
+
+	UFUNCTION(BlueprintCallable)
+	static void GeneratePyFromWidgets(const TArray<FAssetData>& Assets);
+
+	UFUNCTION(BlueprintCallable)
+	static void GeneratePyFromWidget(const FAssetData& Asset);
+
+	UFUNCTION(BlueprintCallable)
+	static TArray<UWidget*> GetAllVariableWidgets(UWidgetBlueprint* WidgetBP);
+
 };

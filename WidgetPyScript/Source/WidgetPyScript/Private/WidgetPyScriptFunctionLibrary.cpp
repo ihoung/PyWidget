@@ -4,6 +4,7 @@
 #include "WidgetPyScriptFunctionLibrary.h"
 #include "BlueprintEditor.h"
 #include "EditorUtilityWidgetBlueprint.h"
+#include "Components/Widget.h"
 
 //UObject* UWidgetPyScriptFunctionLibrary::GetCurrentEditingWidget()
 //{
@@ -33,3 +34,50 @@
 //    }
 //    return Array;
 //}
+
+void UWidgetPyScriptFunctionLibrary::GeneratePyFromWidgets(const TArray<FAssetData>& Assets)
+{
+	for (auto AssetIt = Assets.CreateConstIterator(); AssetIt; ++AssetIt)
+	{
+		const FAssetData& Asset = *AssetIt;
+		if (!Asset.IsRedirector() && Asset.AssetClass != NAME_Class && !(Asset.PackageFlags & PKG_FilterEditorOnly))
+		{
+			if (Asset.GetClass()->IsChildOf(UEditorUtilityWidgetBlueprint::StaticClass()))
+			{
+				UWidgetPyScriptFunctionLibrary::GeneratePyFromWidget(Asset);
+			}
+		}
+	}
+}
+
+void UWidgetPyScriptFunctionLibrary::GeneratePyFromWidget(const FAssetData& Asset)
+{
+	// Load asset
+	FString WidgetPath = Asset.ObjectPath.ToString();
+	if (WidgetPath.IsEmpty())
+	{
+		FString AssetName = Asset.AssetName.ToString();
+		WidgetPath = *FPaths::Combine(Asset.PackagePath.ToString(), AssetName + "." + AssetName);
+	}
+	UWidgetBlueprint* WidgetObject = FindObject<UWidgetBlueprint>(nullptr, *WidgetPath);
+	if (WidgetObject == nullptr)
+	{
+		WidgetObject = LoadObject<UWidgetBlueprint>(nullptr, *WidgetPath);
+	}
+	TArray<UWidget*> VariableWidgets = GetAllVariableWidgets(WidgetObject);
+}
+
+TArray<UWidget*> UWidgetPyScriptFunctionLibrary::GetAllVariableWidgets(UWidgetBlueprint* WidgetBP)
+{
+	TArray<UWidget*> VariableWidgets;
+	WidgetBP->ForEachSourceWidget([&](UWidget* InWidget)
+		{
+			if (InWidget->bIsVariable == 1)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("widget name: %s"), *InWidget->GetName());
+				VariableWidgets.Push(InWidget);
+			}
+		}
+	);
+	return VariableWidgets;
+}

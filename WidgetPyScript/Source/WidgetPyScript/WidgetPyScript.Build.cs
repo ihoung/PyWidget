@@ -45,7 +45,8 @@ public class WidgetPyScript : ModuleRules
 				"SlateCore",
 				"UMGEditor",
                 "Blutility",
-				"Kismet"
+				"Kismet",
+				"UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

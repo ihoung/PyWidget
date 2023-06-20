@@ -133,12 +133,7 @@ TSharedRef<FExtender> FWidgetPyScriptModule::AddCBMenuExtender(const TArray<FAss
 
 void FWidgetPyScriptModule::AddCBMenuAction(TArray<FAssetData> SelectedAssets)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Num: %d"), SelectedAssets.Num());
-	//for (auto AssetIt = SelectedAssets.CreateConstIterator(); AssetIt; ++AssetIt)
-	//{
-	//	const FAssetData& Asset = *AssetIt;
-	//	UE_LOG(LogTemp, Warning, TEXT("asset: %s"), *Asset.GetFullName());
-	//}
+	UWidgetPyScriptFunctionLibrary::GeneratePyFromWidgets(SelectedAssets);
 }
 
 #undef LOCTEXT_NAMESPACE
