@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WidgetPyScriptToolkit.h"
 #include "Modules/ModuleManager.h"
 
 class FToolBarBuilder;
@@ -15,19 +16,7 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-	
-	/** This function will be bound to Command. */
-	void PluginButtonClicked();
-	
-private:
-
-	void RegisterMenus();
-
-	TSharedRef<FExtender> AddCBMenuExtender(const TArray<FAssetData>& SelectedAssets);
-
-	void AddCBMenuAction(TArray<FAssetData> SelectedAssets);
 
 private:
-	TSharedPtr<class FUICommandList> PluginCommands;
-
+	TSharedPtr<FWidgetPyScriptToolkit> PluginToolkit;
 };
