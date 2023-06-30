@@ -2,6 +2,7 @@
 
 
 #include "WidgetPyScriptFunctionLibrary.h"
+#include "WidgetPyScriptGenerator.h"
 #include "BlueprintEditor.h"
 #include "EditorUtilityWidgetBlueprint.h"
 #include "Components/Widget.h"
@@ -65,6 +66,7 @@ void UWidgetPyScriptFunctionLibrary::GeneratePyFromWidget(const FAssetData& Asse
 		WidgetObject = LoadObject<UWidgetBlueprint>(nullptr, *WidgetPath);
 	}
 	TArray<UWidget*> VariableWidgets = GetAllVariableWidgets(WidgetObject);
+	FWidgetPyScriptGenerator::GenerateWidgetXML(Asset, VariableWidgets);
 }
 
 TArray<UWidget*> UWidgetPyScriptFunctionLibrary::GetAllVariableWidgets(UWidgetBlueprint* WidgetBP)
@@ -75,7 +77,7 @@ TArray<UWidget*> UWidgetPyScriptFunctionLibrary::GetAllVariableWidgets(UWidgetBl
 			if (InWidget->bIsVariable == 1)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("widget name: %s"), *InWidget->GetName());
-				VariableWidgets.Push(InWidget);
+				VariableWidgets.Emplace(InWidget);
 			}
 		}
 	);

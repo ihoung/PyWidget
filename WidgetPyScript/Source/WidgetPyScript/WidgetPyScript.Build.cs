@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class WidgetPyScript : ModuleRules
@@ -58,5 +59,20 @@ public class WidgetPyScript : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-	}
+
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            // Add any include paths for the plugin
+            PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "ThirdParty", "include"));
+
+            // Add the import library
+            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "ThirdParty", "Win64", "tinyxml2.lib"));
+
+            // Delay-load the DLL, so we can load it from the right place first
+            PublicDelayLoadDLLs.Add("tinyxml2.dll");
+
+			// Ensure that the DLL is staged along with the executable
+			//RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/TinyXML2/Win64/tinyxml2.dll");
+		}
+    }
 }

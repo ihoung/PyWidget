@@ -18,5 +18,13 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
+	void LoadThirdPartyLib();
+
+	void UnloadThirdPartyLib();
+
+private:
 	TSharedPtr<FWidgetPyScriptToolkit> PluginToolkit;
+
+	// Dynamic library
+	void* DynamicLibHandle;
 };
