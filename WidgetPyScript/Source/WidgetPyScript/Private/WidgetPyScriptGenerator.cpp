@@ -94,12 +94,12 @@ void FWidgetPyScriptGenerator::WriteXMLWidgets(XMLDocument& Doc, const TArray<UW
 	{
 		XMLElement* widget = body->InsertNewChildElement("widget_element");
 
-		FString WidgetType = TargetWidget->GetClass()->GetName();
-		widget->SetAttribute("class", TCHAR_TO_UTF8(*WidgetType));
-
 		FString WidgetName = TargetWidget->GetName();
-		XMLElement* widgetName = widget->InsertNewChildElement("name");
-		widgetName->SetText(TCHAR_TO_UTF8(*WidgetName));
+		widget->SetAttribute("name", TCHAR_TO_UTF8(*WidgetName));
+
+		FString WidgetType = TargetWidget->GetClass()->GetName();
+		XMLElement* widgetType = widget->InsertNewChildElement("class");
+		widgetType->SetText(TCHAR_TO_UTF8(*WidgetType));
 	}
 }
 
