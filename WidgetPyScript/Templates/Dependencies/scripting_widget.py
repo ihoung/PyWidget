@@ -1,7 +1,23 @@
+import os
+import glob
 import functools
 import xml.etree.ElementTree as ET
 import re
 import unreal
+
+def convert_to_absolute_path(path:str):
+    path_parts = path.split('/')
+    if len(path_parts) > 1:
+        if path_parts[1] == 'Game':
+            proj_content_dir = unreal.Paths.project_content_dir()
+            return path.replace('/Game/', proj_content_dir, 1)
+        else:
+            plugin_name = path_parts[1]
+            matched_plugins = glob.glob(unreal.Paths.project_plugins_dir()+'**/{}.uplugin'.format(plugin_name))
+            if len(matched_plugins) > 0:
+                plugin_dir = os.path.dirname(matched_plugins[0])
+                return path.replace('/'+plugin_name, plugin_dir, 1)
+    return path
 
 def get_xml_root(xml_path:str):
     with open(xml_path) as file:
@@ -44,35 +60,15 @@ def get_xml_widget_property(widget_element:ET.Element, tag:str):
     return
 
 
-class ScriptingWidgetBase(object):
-    def __init__(self, asset_path):
-        self.widget_BP = unreal.load_asset(asset_path)
-        self.widget_id = None
-        self.ui = None
-    
-    def __post_init__(self):
-        pass
-
-    def show(self):
-        editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
-        widget, self.widget_id = editor_sub.spawn_and_register_tab_and_get_id(self.widget_BP)
-    
-    def close(self):
-        if self.widget_id:
-            editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
-            editor_sub.close_tab_by_id(self.widget_id)
-            self.widget_id = None
-
-
 # decorator
 def singleton(cls):
     """Make a class a Singleton class (only one instance)"""
+    instances = {}
     @functools.wraps(cls)
     def wrapper_singleton(*args, **kwargs):
-        if not wrapper_singleton.instance:
-            wrapper_singleton.instance = cls(*args, **kwargs)
-        return wrapper_singleton.instance
-    wrapper_singleton.instance = None
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
     return wrapper_singleton
 
 
@@ -81,34 +77,43 @@ def widgetXML(xml_path:str):
         class ScriptingWidgetUIBase(object):
             pass
 
+        class WidgetClass(cls):
+            def __init__(self, widget_BP, ui, *args, **kwargs):
+                self.widget_BP = widget_BP
+                self.widget_id = None
+                self.ui = ui
+                super().__init__(*args, **kwargs)
+
+            def show(self):
+                if hasattr(super(), 'show'):
+                    super().show()
+                editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
+                widget, self.widget_id = editor_sub.spawn_and_register_tab_and_get_id(self.widget_BP)
+            
+            def close(self):
+                if hasattr(super(), 'close'):
+                    super().close()
+                if self.widget_id:
+                    editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
+                    editor_sub.close_tab_by_id(self.widget_id)
+                    self.widget_id = None
+
+            def __del__(self):
+                super().__del__()
+
         @functools.wraps(cls)
         def wrapper_widget(*args, **kwargs):
-            xml_root = get_xml_root(xml_path)
+            xml_root = get_xml_root(convert_to_absolute_path(xml_path))
             asset_name = get_xml_header_value(xml_root, 'asset_name')
             asset_path = get_xml_header_value(xml_root, 'asset_path')
-            widget_asset_obj = cls(asset_path, *args, **kwargs)
+            widget_BP = unreal.load_asset(asset_path)
             ui_object = ScriptingWidgetUIBase()
             for widget_element in iterate_xml_widgets(xml_root):
                 widget_name = widget_element.get('name')
-                widget_BP = unreal.load_asset(asset_path)
                 widget_object = unreal.find_object(None, '{}_C:WidgetTree.{}'.format(asset_path, widget_name))
                 ui_object.__setattr__(widget_name, widget_object)
-            widget_asset_obj.ui = ui_object
-            widget_asset_obj.__post_init__()
+            widget_asset_obj = WidgetClass(widget_BP, ui_object, *args, **kwargs)
+            widget_asset_obj.__name__ = cls.__name__
             return widget_asset_obj
-        if ScriptingWidgetBase not in cls.__bases__:
-            raise TypeError('Class {} with decorator widgetXML doesn\'t inherit class ScriptingWidgetBase'
-                            .format(cls.__name__))
         return wrapper_widget
     return decorator_widget
-
-
-# @widgetXML('E:\MyProject\PyWidget\Plugins\WidgetPyScript\Templates\Dependencies\Test_BP.xml')
-# class Example(ScriptingWidgetBase):
-#     def __post_init__(self):
-#         super().__post_init__()
-#         self.ui.Button_test.on_clicked.add_callable(lambda:print("button click"))
-
-# a=Example()
-# a.show()
-# a.close()

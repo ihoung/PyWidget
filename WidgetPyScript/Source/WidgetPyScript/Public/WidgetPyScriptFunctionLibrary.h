@@ -20,10 +20,8 @@ public:
 	//UFUNCTION(BlueprintCallable)
 	//static TArray<UObject*> GetAllObjects();
 
-	UFUNCTION(BlueprintCallable)
 	static void GeneratePyFromWidgets(const TArray<FAssetData>& Assets);
 
-	UFUNCTION(BlueprintCallable)
 	static void GeneratePyFromWidget(const FAssetData& Asset);
 
 	UFUNCTION(BlueprintCallable)

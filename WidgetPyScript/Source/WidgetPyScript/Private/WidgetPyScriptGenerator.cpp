@@ -3,6 +3,7 @@
 
 #include "WidgetPyScriptGenerator.h"
 #include "Interfaces/IPluginManager.h"
+#include "Misc/FileHelper.h"
 
 using namespace tinyxml2;
 
@@ -54,6 +55,9 @@ void FWidgetPyScriptGenerator::GenerateWidgetXML(const FAssetData& WidgetAsset, 
 	WriteXMLHeader(XMLDoc, WidgetAsset);
 	WriteXMLWidgets(XMLDoc, TargetWidgets);
 	XMLDoc.SaveFile(TCHAR_TO_UTF8(*DestFilePath));
+
+	FString ScriptExamplePath = TemplatesRoot / TEXT("example.py");
+	GenerateScriptExample(ScriptExamplePath, DestDirPath, AssetName);
 }
 
 void FWidgetPyScriptGenerator::WriteXMLHeader(XMLDocument& Doc, const FAssetData& WidgetAsset)
@@ -103,8 +107,22 @@ void FWidgetPyScriptGenerator::WriteXMLWidgets(XMLDocument& Doc, const TArray<UW
 	}
 }
 
-void FWidgetPyScriptGenerator::GenerateScriptExample(FString TemplateFilePath, FString DestDirPath)
+void FWidgetPyScriptGenerator::GenerateScriptExample(FString TemplateFilePath, FString DestDirPath, FString AssetName)
 {
+	IPlatformFile& FileManager = FPlatformFileManager::Get().GetPlatformFile();
+	if (!FileManager.DirectoryExists(*DestDirPath))
+	{
+		FileManager.CreateDirectoryTree(*DestDirPath);
+	}
+	
+	FString DestFile = DestDirPath / TEXT("example.py");
+	if (FileManager.CopyFile(*DestFile, *TemplateFilePath))
+	{
+		FString FileContent;
+		FFileHelper::LoadFileToString(FileContent, *DestFile);
+		FileContent = FileContent.Replace(*FString("ExampleWidget"), *AssetName, ESearchCase::CaseSensitive);
+		FFileHelper::SaveStringToFile(FileContent, *DestFile);
+	}
 }
 
 

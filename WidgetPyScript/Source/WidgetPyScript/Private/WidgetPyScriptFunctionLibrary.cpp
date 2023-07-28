@@ -6,6 +6,7 @@
 #include "BlueprintEditor.h"
 #include "EditorUtilityWidgetBlueprint.h"
 #include "Components/Widget.h"
+#include "Interfaces/IPluginManager.h"
 
 //UObject* UWidgetPyScriptFunctionLibrary::GetCurrentEditingWidget()
 //{

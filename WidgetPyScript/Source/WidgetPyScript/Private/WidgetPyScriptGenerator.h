@@ -21,5 +21,5 @@ private:
 	static void WriteXMLHeader(tinyxml2::XMLDocument& Doc, const FAssetData& WidgetAsset);
 	static void WriteXMLWidgets(tinyxml2::XMLDocument& Doc, const TArray<UWidget*>& TargetWidgets);
 
-	static void GenerateScriptExample(FString TemplateFilePath, FString DestDirPath);
+	static void GenerateScriptExample(FString TemplateFilePath, FString DestDirPath, FString AssetName);
 };
