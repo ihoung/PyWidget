@@ -24,7 +24,4 @@ public:
 
 	static void GeneratePyFromWidget(const FAssetData& Asset);
 
-	UFUNCTION(BlueprintCallable)
-	static TArray<UWidget*> GetAllVariableWidgets(UWidgetBlueprint* WidgetBP);
-
 };

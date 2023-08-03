@@ -66,14 +66,8 @@ void UWidgetPyScriptFunctionLibrary::GeneratePyFromWidget(const FAssetData& Asse
 	{
 		WidgetObject = LoadObject<UWidgetBlueprint>(nullptr, *WidgetPath);
 	}
-	TArray<UWidget*> VariableWidgets = GetAllVariableWidgets(WidgetObject);
-	FWidgetPyScriptGenerator::GenerateWidgetXML(Asset, VariableWidgets);
-}
-
-TArray<UWidget*> UWidgetPyScriptFunctionLibrary::GetAllVariableWidgets(UWidgetBlueprint* WidgetBP)
-{
 	TArray<UWidget*> VariableWidgets;
-	WidgetBP->ForEachSourceWidget([&](UWidget* InWidget)
+	WidgetObject->ForEachSourceWidget([&](UWidget* InWidget)
 		{
 			if (InWidget->bIsVariable == 1)
 			{
@@ -82,5 +76,6 @@ TArray<UWidget*> UWidgetPyScriptFunctionLibrary::GetAllVariableWidgets(UWidgetBl
 			}
 		}
 	);
-	return VariableWidgets;
+
+	FWidgetPyScriptGenerator::GenerateWidgetXML(Asset, VariableWidgets);
 }
