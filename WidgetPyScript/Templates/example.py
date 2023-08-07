@@ -15,8 +15,6 @@ class ExampleWidget:
     def close(self):
         pass
 
-    def __del__(self):
-        pass
 
 def main():
     a=ExampleWidget()

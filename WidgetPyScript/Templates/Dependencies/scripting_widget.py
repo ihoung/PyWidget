@@ -85,10 +85,15 @@ def widgetXML(xml_path:str):
                 super().__init__(*args, **kwargs)
 
             def show(self):
+                editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
+                if editor_sub.find_utility_widget_from_blueprint(self.widget_BP):
+                    return
                 if hasattr(super(), 'show'):
                     super().show()
-                editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
-                widget, self.widget_id = editor_sub.spawn_and_register_tab_and_get_id(self.widget_BP)
+                if not self.widget_id:
+                    widget, self.widget_id = editor_sub.spawn_and_register_tab_and_get_id(self.widget_BP)
+                elif not editor_sub.does_tab_exist(self.widget_id):
+                    editor_sub.spawn_registered_tab_by_id(self.widget_id)
             
             def close(self):
                 if hasattr(super(), 'close'):
@@ -96,16 +101,15 @@ def widgetXML(xml_path:str):
                 if self.widget_id:
                     editor_sub = unreal.get_editor_subsystem(unreal.EditorUtilitySubsystem)
                     editor_sub.close_tab_by_id(self.widget_id)
-                    self.widget_id = None
-
-            def __del__(self):
-                super().__del__()
 
         @functools.wraps(cls)
         def wrapper_widget(*args, **kwargs):
             xml_root = get_xml_root(convert_to_absolute_path(xml_path))
             asset_name = get_xml_header_value(xml_root, 'asset_name')
             asset_path = get_xml_header_value(xml_root, 'asset_path')
+            widget_asset = unreal.AssetRegistryHelpers.get_asset_registry().get_asset_by_object_path(asset_path)
+            if widget_asset.is_asset_loaded():
+                unreal.EditorLoadingAndSavingUtils.reload_packages([unreal.load_package(widget_asset.package_name)])
             widget_BP = unreal.load_asset(asset_path)
             ui_object = ScriptingWidgetUIBase()
             for widget_element in iterate_xml_widgets(xml_root):
