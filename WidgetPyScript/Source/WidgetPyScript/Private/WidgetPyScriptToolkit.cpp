@@ -110,7 +110,7 @@ TSharedRef<FExtender> FWidgetPyScriptToolkit::AddCBMenuExtender(const TArray<FAs
 					{
 						// Add Menu Entry Here
 						MenuBuilder.AddMenuEntry(
-							LOCTEXT("GeneratePy", "Genereate Python Scripts"),
+							LOCTEXT("GeneratePy", "Generate Python Scripts"),
 							LOCTEXT("GeneratePy ToolTip", "Generate Python Scripts for the associated Widget"),
 							FSlateIcon(FWidgetPyScriptStyle::GetStyleSetName(), "WidgetPyScript.MenuIcon"),
 							FUIAction(FExecuteAction::CreateRaw(this, &FWidgetPyScriptToolkit::AddCBMenuAction, SelectedAssets)),
