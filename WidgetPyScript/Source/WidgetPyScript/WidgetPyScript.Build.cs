@@ -12,7 +12,8 @@ public class WidgetPyScript : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
-			}
+				Path.Combine(ModuleDirectory, "..", "ThirdParty", "TinyXML2", "include"),
+            }
 			);
 				
 		
@@ -28,7 +29,8 @@ public class WidgetPyScript : ModuleRules
 			{
 				"Core",
 				// ... add other public dependencies that you statically link with here ...
-			}
+				"TinyXML2",
+            }
 			);
 			
 		
@@ -60,19 +62,16 @@ public class WidgetPyScript : ModuleRules
 			}
 			);
 
-        if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-            // Add any include paths for the plugin
-            PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "ThirdParty", "include"));
+		//if (Target.Platform == UnrealTargetPlatform.Win64)
+		//{
+		//	// Add the import library
+		//	PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "../ThirdParty", "Win64", "tinyxml2.lib"));
 
-            // Add the import library
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "ThirdParty", "Win64", "tinyxml2.lib"));
+  //          // Put the library along with the executable
+  //          RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/TinyXML2/Win64/tinyxml2.dll");
 
-            // Delay-load the DLL, so we can load it from the right place first
-            PublicDelayLoadDLLs.Add("tinyxml2.dll");
-
-			// Ensure that the DLL is staged along with the executable
-			//RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/TinyXML2/Win64/tinyxml2.dll");
-		}
-    }
+  //          // Delay-load the DLL, so we can load it from the right place first
+  //          PublicDelayLoadDLLs.Add("tinyxml2.dll");
+		//}
+	}
 }
