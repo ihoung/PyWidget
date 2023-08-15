@@ -15,7 +15,7 @@ public class TinyXML2 : ModuleRules
 			PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "tinyxml2.lib"));
 
             // Ensure that the DLL is staged along with the executable
-            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "Win64", "tinyxml2.dll"));
+            RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/TinyXML2/Win64/tinyxml2.dll");
 
             // Delay-load the DLL, so we can load it from the right place first
             PublicDelayLoadDLLs.Add("tinyxml2.dll");

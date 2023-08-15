@@ -27,7 +27,7 @@ void FWidgetPyScriptModule::LoadThirdPartyLib()
 {
 	const FString BasePluginDir = IPluginManager::Get().FindPlugin("WidgetPyScript")->GetBaseDir();
 
-	const FString LibExamplePath = FPaths::Combine(*BasePluginDir, TEXT("Source/ThirdParty/TinyXML2/Win64/tinyxml2.dll"));
+	const FString LibExamplePath = FPaths::Combine(*BasePluginDir, TEXT("Binaries/ThirdParty/TinyXML2/Win64/tinyxml2.dll"));
 
 	DynamicLibHandle = FPlatformProcess::GetDllHandle(*LibExamplePath);
 
