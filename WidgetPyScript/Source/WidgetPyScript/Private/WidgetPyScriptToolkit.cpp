@@ -8,6 +8,7 @@
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
 #include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
 #include "EditorUtilityWidgetBlueprint.h"
 
 #define LOCTEXT_NAMESPACE "FWidgetPyScriptModule"
@@ -113,7 +114,7 @@ TSharedRef<FExtender> FWidgetPyScriptToolkit::AddCBMenuExtender(const TArray<FAs
 							LOCTEXT("GeneratePy", "Generate Python Scripts"),
 							LOCTEXT("GeneratePy ToolTip", "Generate Python Scripts for the associated Widget"),
 							FSlateIcon(FWidgetPyScriptStyle::GetStyleSetName(), "WidgetPyScript.MenuIcon"),
-							FUIAction(FExecuteAction::CreateRaw(this, &FWidgetPyScriptToolkit::AddCBMenuAction, SelectedAssets)),
+							FUIAction(FExecuteAction::CreateRaw(this, &FWidgetPyScriptToolkit::AddCBMenuAction)),
 							NAME_None,
 							EUserInterfaceActionType::Button
 						);
@@ -127,8 +128,12 @@ TSharedRef<FExtender> FWidgetPyScriptToolkit::AddCBMenuExtender(const TArray<FAs
 	return Extender;
 }
 
-void FWidgetPyScriptToolkit::AddCBMenuAction(TArray<FAssetData> SelectedAssets)
+void FWidgetPyScriptToolkit::AddCBMenuAction()
 {
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
+	TArray<FAssetData> SelectedAssets;
+	IContentBrowserSingleton& ContentBrowserSingleton = ContentBrowserModule.Get();
+	ContentBrowserSingleton.GetSelectedAssets(SelectedAssets);
 	UWidgetPyScriptFunctionLibrary::GeneratePyFromWidgets(SelectedAssets);
 }
 

@@ -26,5 +26,5 @@ private:
 
 	TSharedRef<FExtender> AddCBMenuExtender(const TArray<FAssetData>& SelectedAssets);
 
-	void AddCBMenuAction(TArray<FAssetData> SelectedAssets);
+	void AddCBMenuAction();
 };
